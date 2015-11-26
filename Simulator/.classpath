@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="libs/jogl-all.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Geometry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CommunicationChannel"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
