@@ -9,5 +9,11 @@ public class Info {
 			new Position(300.0, 2.0, 0.0) };
 	
 	public static Position targetPosition = new Position(500.0, 780, 0.0);
+	
+	public static int numOfRobotAgents = currentPositions.length;
+	
+	public static String serverHost = "localhost";
+	
+	public static int serverPort = 1978;
 
 }

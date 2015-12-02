@@ -5,6 +5,7 @@ import terrain.Position;
 import terrain.PositionUtil;
 import util.Info;
 import processing.core.*;
+import shared.CurrentPositions;
 
 public class MyProcessingSketch extends PApplet {
 
@@ -12,14 +13,7 @@ public class MyProcessingSketch extends PApplet {
 	float y = 100;
 	float angle1 = (float) 0.0;
 	float segLength = 50;
-
-	Position[] previousePositions = null;
-	public static Position[] currentPositions = new Position[6];
-
-	public void update() {
-		previousePositions = currentPositions;
-	}
-
+	
 	public void settings() {
 		size(1400, 800);
 	}
@@ -34,17 +28,12 @@ public class MyProcessingSketch extends PApplet {
 		
 		background(0);
 
-		if (currentPositions != null && previousePositions != null) {
+		if (!CurrentPositions.concurrentMap.isEmpty()) {
 			System.out.println("*******************************************************************");
-			for (int i = 0; i < currentPositions.length; i++) {
+			for (int i = 0; i < CurrentPositions.concurrentMap.size(); i++) {
 
-				float dx = (float) currentPositions[i].getX() - (float) previousePositions[i].getX();
-				float dy = (float) currentPositions[i].getY() - (float) previousePositions[i].getY();
-
-				angle1 = atan2(dy, dx);
-
-				x = (float) currentPositions[i].getX();
-				y = (float) currentPositions[i].getY();
+				x = (float) ((Position) (CurrentPositions.concurrentMap.get(i))).getX();
+				y = (float) ((Position) (CurrentPositions.concurrentMap.get(i))).getY();
 
 				System.out.print(x + "," + y + "  <-->  ");
 				// segment(x, y, angle1);
@@ -56,7 +45,6 @@ public class MyProcessingSketch extends PApplet {
 			}
 			System.out.println();
 			System.out.println("*******************************************************************");
-			update();
 		}		
 	}
 

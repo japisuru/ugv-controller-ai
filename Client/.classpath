@@ -23,7 +23,6 @@
 	<classpathentry kind="lib" path="libs/jogl-all.jar"/>
 	<classpathentry kind="lib" path="libs/jade.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Geometry"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CommunicationChannel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
