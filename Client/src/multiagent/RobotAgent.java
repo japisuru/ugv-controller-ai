@@ -18,37 +18,45 @@ public class RobotAgent extends Agent {
     int agentId;
     int data;
 
-	public RobotAgent(int agentID) throws UnknownHostException, IOException 
+	public void init() throws UnknownHostException, IOException 
 	{
-		this.agentId = agentID;
-		Socket socket = new Socket(Info.serverHost, Info.serverPort);
-		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		new Thread()
-		{	
-			public void run()
-			{
-				String line;
-				while(true)
-				{
-					try {
-						line = in.readLine();
-						data = 0;
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				
-				}
-			}
-		};
-		
-		out = new PrintWriter(socket.getOutputStream(), true);
+//		Socket socket = new Socket(Info.serverHost, Info.serverPort);
+//		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//		new Thread()
+//		{	
+//			public void run()
+//			{
+//				String line;
+//				while(true)
+//				{
+//					try {
+//						line = in.readLine();
+//						data = 0;
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				
+//				}
+//			}
+//		};
+//		
+//		out = new PrintWriter(socket.getOutputStream(), true);
 
 	}
 
 	protected void setup() {
-		System.out.println("Hello World. ");
-		System.out.println("My name is " + getLocalName());
+		Object[] args = getArguments();
+		String aid = String.valueOf(args[0]);
+		agentId = Integer.parseInt(aid);
+		try {
+			init();
+			System.out.println("My id is: " + agentId);
+			//addBehaviour(new RobotAgentBrain(this,2000));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void write(Position position)
