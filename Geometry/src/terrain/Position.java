@@ -12,6 +12,14 @@ public class Position {
         this.z = z;
     }
     
+    public Position(String str)
+    {
+    	String temp [] = str.split(",");
+        this.x = Double.parseDouble(temp[0]);
+        this.y = Double.parseDouble(temp[1]);
+        this.z = Double.parseDouble(temp[2]);
+    }
+    
     //calculate Euclidean Distance
     public double getDistance(Position otherPoint)
     {
@@ -63,6 +71,20 @@ public class Position {
      */
     public void setZ(double z) {
         this.z = z;
+    }
+    
+    @Override
+    public boolean equals(Object other){
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof Position))return false;
+        Position otherMyClass = (Position)other;
+        if(this.getX() == otherMyClass.getX() && this.getY() == otherMyClass.getY() && this.getZ() == otherMyClass.getZ()) return true;
+        else return false;
+    }
+    
+    public String toString() { 
+        return this.x + "," + this.y + "," + this.z;
     }
 }
 

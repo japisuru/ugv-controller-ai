@@ -79,4 +79,9 @@ public class PathPlanner {
         }
         
     }
+    
+    public static void calculateNextPosition(Position currentPosition, Position initialPosition, Position targetPosition)
+    {
+    	
+    }
 }

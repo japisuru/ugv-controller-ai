@@ -6,61 +6,34 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
+import behaviors.CommunicationBehavior;
+import behaviors.NeigborhoodInfoGatheringBehavior;
+import behaviors.RobotWalkingBehavior;
+import brain.RobotKnowledgeBase;
+import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
 import terrain.Position;
 import util.Info;
 
 public class RobotAgent extends Agent {
-	
 
-    PrintWriter out;
-    int agentId;
-    int data;
+	private int agentId;
 
-	public void init() throws UnknownHostException, IOException 
-	{
-//		Socket socket = new Socket(Info.serverHost, Info.serverPort);
-//		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//		new Thread()
-//		{	
-//			public void run()
-//			{
-//				String line;
-//				while(true)
-//				{
-//					try {
-//						line = in.readLine();
-//						data = 0;
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				
-//				}
-//			}
-//		};
-//		
-//		out = new PrintWriter(socket.getOutputStream(), true);
-
-	}
+	RobotKnowledgeBase rkb;
 
 	protected void setup() {
 		Object[] args = getArguments();
 		String aid = String.valueOf(args[0]);
 		agentId = Integer.parseInt(aid);
-		try {
-			init();
-			System.out.println("My id is: " + agentId);
-			//addBehaviour(new RobotAgentBrain(this,2000));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void write(Position position)
-	{
-		out.println(agentId + "-" + position.getX() + "," + position.getY() + "," + position.getZ() );
+
+		rkb = new RobotKnowledgeBase(1, 0.5, Info.currentPositions[agentId], Info.targetPosition);
+		
+		addBehaviour(new NeigborhoodInfoGatheringBehavior(this, agentId, rkb));
+		addBehaviour(new RobotWalkingBehavior(this, agentId, rkb));
+		addBehaviour(new CommunicationBehavior(this, agentId, rkb));
+		// addBehaviour(new RobotAgentBrain(this,2000));
 	}
 }
