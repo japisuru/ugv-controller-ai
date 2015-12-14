@@ -22,6 +22,7 @@ public class MyProcessingSketch extends PApplet {
 		// frameRate(1);
 		strokeWeight((float) 20.0);
 		stroke(255, 100);
+		CurrentPositions.init();
 	}
 
 	public void draw() {

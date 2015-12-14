@@ -17,6 +17,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import terrain.Position;
 import util.Info;
+import util.MyLog;
 
 public class RobotAgent extends Agent {
 
@@ -29,11 +30,19 @@ public class RobotAgent extends Agent {
 		String aid = String.valueOf(args[0]);
 		agentId = Integer.parseInt(aid);
 
-		rkb = new RobotKnowledgeBase(1, 0.5, Info.currentPositions[agentId], Info.targetPosition);
+		MyLog mylog = new MyLog(agentId + "_agent", "");
 		
-		addBehaviour(new NeigborhoodInfoGatheringBehavior(this, agentId, rkb));
-		addBehaviour(new RobotWalkingBehavior(this, agentId, rkb));
-		addBehaviour(new CommunicationBehavior(this, agentId, rkb));
+		rkb = new RobotKnowledgeBase(agentId, 1, 0.5, Info.currentPositions[agentId], Info.targetPosition);
+		
+		addBehaviour(new NeigborhoodInfoGatheringBehavior(mylog, this, agentId, rkb));
+		addBehaviour(new RobotWalkingBehavior(mylog, this, agentId, rkb));
+		try {
+			addBehaviour(new CommunicationBehavior(mylog, this, agentId, rkb));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// addBehaviour(new RobotAgentBrain(this,2000));
+		System.out.println(agentId + " --> " + "RobotAgent" + " --> " + "Started and added all behaviors for agent " + agentId);
 	}
 }

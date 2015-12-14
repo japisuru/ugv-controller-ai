@@ -82,6 +82,7 @@ public class PathPlanner {
     
     public static void calculateNextPosition(Position currentPosition, Position initialPosition, Position targetPosition)
     {
-    	
+    	System.out.println("PathPlanner -> inside of calculateNextPosition");
+    	//update current position
     }
 }

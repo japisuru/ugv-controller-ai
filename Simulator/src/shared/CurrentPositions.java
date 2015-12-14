@@ -10,7 +10,7 @@ public class CurrentPositions {
 
 	public static ConcurrentMap concurrentMap = new ConcurrentHashMap();
 	
-	public void CurrentPositions()
+	public static void init()
 	{
 		for (int i = 0; Info.currentPositions.length > i; i++) 
 		{
