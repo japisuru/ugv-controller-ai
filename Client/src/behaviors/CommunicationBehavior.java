@@ -120,13 +120,15 @@ public class CommunicationBehavior extends SimpleBehaviour {
 	@Override
 	public void action() {
 		ACLMessage aclMessage = myAgent.receive(mt);
-
+		
 		if (aclMessage != null) 
-		{
+		{		
 			String data[] = aclMessage.getContent().split("-");
 			String event = data[0];
 			int sender = Integer.parseInt(data[1]);
 			String content = data[2];
+			
+			mylog.log("CommunicationBehavior -> action" + " --> " + event);
 			
 			if (event.compareTo("SendResult") == 0) 
 			{
