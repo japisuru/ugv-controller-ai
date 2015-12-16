@@ -19,6 +19,7 @@ import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionResult;
 import org.jenetics.engine.EvolutionStatistics;
 
+import brain.RobotKnowledgeBase;
 import terrain.Position;
 
 import static org.jenetics.engine.limit.bySteadyFitness;
@@ -80,9 +81,10 @@ public class PathPlanner {
         
     }
     
-    public static void calculateNextPosition(Position currentPosition, Position initialPosition, Position targetPosition)
+    public static void calculateNextPosition(RobotKnowledgeBase rkb)
     {
     	System.out.println("PathPlanner -> inside of calculateNextPosition");
+    	rkb.getCurrentPosition().setY(rkb.getCurrentPosition().getY() + 1);
     	//update current position
     }
 }

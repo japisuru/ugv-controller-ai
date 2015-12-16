@@ -30,14 +30,14 @@ public class RobotAgent extends Agent {
 		String aid = String.valueOf(args[0]);
 		agentId = Integer.parseInt(aid);
 
-		MyLog mylog = new MyLog(agentId + "_agent", "");
+		//MyLog mylog = new MyLog(agentId + "_agent", "");
 		
 		rkb = new RobotKnowledgeBase(agentId, 1, 0.5, Info.currentPositions[agentId], Info.targetPosition);
-		
-		addBehaviour(new NeigborhoodInfoGatheringBehavior(mylog, this, agentId, rkb));
-		addBehaviour(new RobotWalkingBehavior(mylog, this, agentId, rkb));
+			
+		//addBehaviour(new RobotWalkingBehavior(mylog, this, agentId, rkb));
 		try {
-			addBehaviour(new CommunicationBehavior(mylog, this, agentId, rkb));
+			addBehaviour(new CommunicationBehavior(new MyLog(agentId + "_agent_CommunicationBehavior", ""), this, agentId, rkb));
+			//addBehaviour(new NeigborhoodInfoGatheringBehavior(new MyLog(agentId + "_agent_NeigborhoodInfoGatheringBehavior", ""), this, agentId, rkb));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

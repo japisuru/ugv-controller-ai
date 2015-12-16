@@ -13,12 +13,14 @@ import java.net.Socket;
 import math.Line;
 import shared.CurrentPositions;
 import terrain.Position;
+import util.MyLog;
 
 public class AgentHandler extends Thread {
     protected Socket socket;
     private int clientId;
     BufferedReader brinp = null;
     BufferedWriter brout = null;
+    private MyLog myLog = null;
 
     public AgentHandler(Socket clientSocket) {
         this.socket = clientSocket;
@@ -37,19 +39,31 @@ public class AgentHandler extends Thread {
     	Position currentPosition = (Position) CurrentPositions.concurrentMap.get(agentId);
     	Line line = new Line(currentPosition,position);
     	
+    	if(myLog == null)
+    	{
+    		myLog = new MyLog("Server/" + agentId + "_agent_Server", "");
+    	}	
+    	
+    	myLog.log("Line --> " + line.toString());
+    	
     	while(true)
     	{
     		currentPosition = (Position) CurrentPositions.concurrentMap.get(agentId);
+    		
     		if(currentPosition.getDistance(position) < 1.0)
     		{
     			CurrentPositions.concurrentMap.put(agentId, position );
+    			return;
     		}
     		else
     		{
     			CurrentPositions.concurrentMap.put(agentId,line.calculatePointOnLine(1.0));
     		}
+    		
+    		myLog.log("Intermediate future Position: " + ((Position) CurrentPositions.concurrentMap.get(agentId)).toString());
+    		
     		System.out.println("AgentHandler -> Position updated");
-    		sleep(2000);
+    		sleep(1000);
     	}
     }
     

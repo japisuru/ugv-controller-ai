@@ -12,7 +12,10 @@ public class Line {
 	{
 		this.start = start;
 		this.end = end;
-		this.slope = (this.end.getY() - this.start.getY()) / (this.end.getX() - this.start.getX());
+		if(this.end.getX() - this.start.getX() == 0)
+			this.slope = Math.PI / 2;
+		else
+			this.slope = (this.end.getY() - this.start.getY()) / (this.end.getX() - this.start.getX());
 	}
 
 	public double getSlope()
@@ -22,6 +25,11 @@ public class Line {
 	
 	public Position calculatePointOnLine(double distanceFromStart)
 	{
-		return new Position(distanceFromStart * Math.cos(slope), distanceFromStart * Math.sin(slope), 0);
+		return new Position(start.getX() + (distanceFromStart * Math.cos(slope)), start.getY() + (distanceFromStart * Math.sin(slope)), 0);
 	}
+	
+	public String toString() 
+	{ 
+        return "Start: " + start.getX() + "," + start.getY() + "," + start.getZ() + "\nl" + "End: " + end.getX() + "," + end.getY() + "," + end.getZ() + "\nl" + "Slope: " + slope;
+    }
 }

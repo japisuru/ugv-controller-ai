@@ -9,6 +9,7 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import multiagent.RobotAgent;
+import terrain.Position;
 import util.Info;
 import util.MyLog;
 
@@ -47,11 +48,11 @@ public class RobotWalkingBehavior extends SimpleBehaviour {
 			
 			mylog.log("RobotWalkingBehavior -> action" + " --> " + event);
 
+			
 			if (event.compareTo("CalculateNextPosition") == 0) 
 			{
 				mylog.log("RobotWalkingBehavior -> Received CalculateNextPosition from " + sender);
-				pathPlanner.calculateNextPosition(rkb.getCurrentPosition(), rkb.getInitialPosition(),
-						rkb.getTargetPosition());
+				pathPlanner.calculateNextPosition(rkb);
 				mylog.log("RobotWalkingBehavior -> Calculated next position");
 				
 				ACLMessage reqMessage = new ACLMessage(ACLMessage.INFORM);

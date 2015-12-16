@@ -20,7 +20,7 @@ public class MyLog
 			logger.addHandler(fh);
 			logger.setUseParentHandlers(false);
 			
-	        SimpleFormatter formatter = new SimpleFormatter();  
+			MyFormatter formatter = new MyFormatter();  
 	        fh.setFormatter(formatter);
 		} catch (SecurityException | IOException e) {
 			// TODO Auto-generated catch block

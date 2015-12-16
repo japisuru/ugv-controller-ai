@@ -10,10 +10,10 @@ import java.rmi.server.UnicastRemoteObject;
 import processing.core.PApplet;
 
 
-public class Main {
-
-	public static void main(String[] args) throws RemoteException, AlreadyBoundException {
-        
+public class Simulator {
+	
+	public static void start()
+	{
 		PApplet.main(new String[] { "--present", "processing.MyProcessingSketch" });
 	}
 

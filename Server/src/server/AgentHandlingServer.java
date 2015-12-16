@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import main.Simulator;
+import shared.CurrentPositions;
 import util.Info;
 
 
@@ -14,6 +16,9 @@ public class AgentHandlingServer {
     public static void main(String args[]) {
         ServerSocket serverSocket = null;
         Socket socket = null;
+        
+        CurrentPositions.init();
+        Simulator.start();
         
         try {
             serverSocket = new ServerSocket(Info.serverPort);
@@ -30,7 +35,9 @@ public class AgentHandlingServer {
             } catch (IOException e) {
                 System.out.println("I/O error: " + e);
             }
+            
             // new threa for a client
+            
             new AgentHandler(socket).start();
         }
         

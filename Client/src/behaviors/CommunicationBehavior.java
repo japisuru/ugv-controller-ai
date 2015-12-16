@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import brain.RobotKnowledgeBase;
+import genetic.PathPlanner;
 import jade.core.AID;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -25,6 +26,8 @@ public class CommunicationBehavior extends SimpleBehaviour {
 	RobotKnowledgeBase rkb;
 	PrintWriter out;
 	MyLog mylog;
+	PathPlanner pathPlanner;
+	int collectedCount;
 
 	public CommunicationBehavior(MyLog myLog, RobotAgent agent, int agentId, RobotKnowledgeBase rkb)
 			throws UnknownHostException, IOException {
@@ -33,9 +36,11 @@ public class CommunicationBehavior extends SimpleBehaviour {
 		this.agent = agent;
 		this.agentId = agentId;
 		this.rkb = rkb;
+		this.pathPlanner = new PathPlanner();
+		this.collectedCount = 0;
 		init();
-		//mylog.log("testLogging message");
-		mylog.log("CommunicationBehavior -> Inialized");
+		// mylog.log("testLogging message");
+		mylog.log("Inialized");
 	}
 
 	public void init() throws UnknownHostException, IOException {
@@ -47,8 +52,8 @@ public class CommunicationBehavior extends SimpleBehaviour {
 					socket = new Socket(Info.serverHost, Info.serverPort);
 					BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					out = new PrintWriter(socket.getOutputStream(), true);
-					mylog.log("CommunicationBehavior --> Before seperate thread");
-					mylog.log("CommunicationBehavior --> Inside seperate thread");
+					mylog.log("Before seperate thread");
+					mylog.log("Inside seperate thread");
 					String line;
 					while (true) {
 						try {
@@ -57,15 +62,16 @@ public class CommunicationBehavior extends SimpleBehaviour {
 							if (line != null) {
 								String[] spt1 = line.split("-");
 
-								System.out.println(agentId + " --> " + "CommunicationBehavior --> " + spt1[0] + " received");
+								System.out.println(
+										agentId + " --> " + "CommunicationBehavior --> " + spt1[0] + " received");
 
 								if (spt1[0] == "Obstacle") {
-									mylog.log("CommunicationBehavior --> Received Obstacle from sever");
+									mylog.log("Received Obstacle from sever");
 									updateObstacles(spt1[1]);
 									calculateNextPosition();
 								}
 								if (spt1[0] == "Completed")
-									mylog.log("CommunicationBehavior --> Received Completed from server");
+									mylog.log("Received Completed from server");
 								calculateNextPosition();
 							}
 
@@ -88,53 +94,84 @@ public class CommunicationBehavior extends SimpleBehaviour {
 		Position newObstacle = new Position(Double.parseDouble(spt2[0]), Double.parseDouble(spt2[1]),
 				Double.parseDouble(spt2[2]));
 		rkb.addObstacle(newObstacle);
-		mylog.log("CommunicationBehavior -> Updated obstacles");
+		mylog.log("Updated obstacles");
 	}
 
 	void calculateNextPosition() {
-		ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
-		aclMessage.setContent("Collect-" + agentId + "-Empty");
-		aclMessage.addReceiver(new AID("agent" + agentId, AID.ISLOCALNAME));
-		myAgent.send(aclMessage);
-		mylog.log("CommunicationBehavior -> Sent Collect to " + agentId);
+		// ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
+		// aclMessage.setContent("Collect-" + agentId + "-Empty");
+		// aclMessage.addReceiver(new AID("agent" + agentId, AID.ISLOCALNAME));
+		// myAgent.send(aclMessage);
+		// mylog.log("CommunicationBehavior -> Sent Collect to " + agentId);
+
+		ACLMessage reqMessage = new ACLMessage(ACLMessage.INFORM);
+		reqMessage.setContent("PositionRequest-" + agentId + "-Empty");
+		for (int i = 0; i < Info.numOfRobotAgents; i++) {
+			if (i != agentId) {
+				AID driver = new AID("agent" + i + "@" + myAgent.getHap(), AID.ISGUID);
+				reqMessage.addReceiver(driver);
+				mylog.log("Sent position request to " + i);
+			}
+		}
+		mylog.log("Sent position request to all others");
+		this.rkb.removeAllNeighbors();
+		myAgent.send(reqMessage);
 	}
 
 	public void sendPositionToSimulator(Position position) {
-		out.println("SimulateAgent" + "-" + agentId + "-" + position.getX() + "," + position.getY() + "," + position.getZ());
-		mylog.log("CommunicationBehavior -> Sent new position to simulator");
+		out.println("SimulateAgent" + "-" + agentId + "-" + position.getX() + "," + position.getY() + ","
+				+ position.getZ());
+		mylog.log("Sent new position to simulator");
 	}
 
 	public void sendPositionToOthers(Position position) {
 
 		ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
-		aclMessage.setContent("PositionUpdate" + "-" +agentId + "-" + position.getX() + "," + position.getY() + "," + position.getZ());
+		aclMessage.setContent("PositionUpdate" + "-" + agentId + "-" + position.getX() + "," + position.getY() + ","
+				+ position.getZ());
 
 		for (int i = 0; i < Info.numOfRobotAgents; i++)
 			if (i != agentId)
 				aclMessage.addReceiver(new AID("agent" + i, AID.ISLOCALNAME));
 
 		myAgent.send(aclMessage);
-		mylog.log("CommunicationBehavior -> Sent new position to other agents");
+		mylog.log("Sent new position to other agents");
 	}
 
 	@Override
 	public void action() {
 		ACLMessage aclMessage = myAgent.receive(mt);
-		
-		if (aclMessage != null) 
-		{		
+
+		if (aclMessage != null) {
 			String data[] = aclMessage.getContent().split("-");
 			String event = data[0];
 			int sender = Integer.parseInt(data[1]);
 			String content = data[2];
-			
-			mylog.log("CommunicationBehavior -> action" + " --> " + event);
-			
-			if (event.compareTo("SendResult") == 0) 
+
+			mylog.log("ACTION" + " --> " + event + " - " + sender  + " - " + content);
+
+			if (event.compareTo("PositionResponse") == 0) 
 			{
-				mylog.log("CommunicationBehavior -> Received SendResult from " + sender);
-				//sendPositionToOthers(rkb.getCurrentPosition()); don't want to sent. because when some agent is calculating new position, always they will request neighbor's positions
-				sendPositionToSimulator(rkb.getCurrentPosition());
+				mylog.log("Received PositionResponse from " + sender);
+				
+				this.rkb.addNeighbor(new Position(content));
+				collectedCount++;
+				if (collectedCount % (Info.numOfRobotAgents - 1) == 0) 
+				{
+					pathPlanner.calculateNextPosition(rkb);
+					sendPositionToSimulator(rkb.getCurrentPosition());
+					
+					mylog.log("Calculated next position");
+				}				
+			}
+			if (event.compareTo("PositionRequest") == 0) 
+			{
+				mylog.log("Recieved PositionRequest from " + sender);
+				ACLMessage reply = new ACLMessage(ACLMessage.INFORM);
+				reply.setContent("PositionResponse-" + agentId + "-" + rkb.getCurrentPosition().toString());
+				reply.addReceiver(new AID("agent" + sender + "@" + myAgent.getHap(), AID.ISGUID));
+				myAgent.send(reply);
+				mylog.log("Sent Position response to " + sender);
 			}
 		}
 	}
