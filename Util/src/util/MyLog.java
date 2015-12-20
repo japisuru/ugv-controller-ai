@@ -31,6 +31,11 @@ public class MyLog
 	
 	public void log(String message)
 	{
+		//logger.info(this.preText + " : " + message);
+	}
+	
+	public void testLog(String message)
+	{
 		logger.info(this.preText + " : " + message);
 	}
 }

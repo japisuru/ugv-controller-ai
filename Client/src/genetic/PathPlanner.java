@@ -33,15 +33,15 @@ public class PathPlanner {
     
     static double minimumGeneValue = -10;
     static double maximumGeneValue = 10;
-    private static final int numOfIterations = 15;
+    private static final int numOfIterations = 150;
     
-    public static void calculateFuturePositions(Position [] currentPositions, Position initialPosition, Position targetPosition)
+    public void calculateFuturePositions(Position currentPosition, Position [] neighborPositions, Position initialPosition, Position targetPosition)
     {
-        MyFitnessFunction ff = new MyFitnessFunction(currentPositions,  initialPosition, targetPosition);
+        MyFitnessFunction ff = new MyFitnessFunction(currentPosition, neighborPositions,  initialPosition, targetPosition);
         final Engine<DoubleGene, Double> engine = Engine
 			.builder(
 				ff,
-				DoubleChromosome.of(minimumGeneValue, maximumGeneValue, currentPositions.length * 2))
+				DoubleChromosome.of(minimumGeneValue, maximumGeneValue, 2))
 			.optimize(Optimize.MAXIMUM)
 			.maximalPhenotypeAge(numOfIterations)
 			.populationSize(1000)
@@ -74,17 +74,22 @@ public class PathPlanner {
 		
 		final Chromosome<DoubleGene> chromosome = best.getGenotype().getChromosome();
 		
-        for (int i = 0; i < chromosome.length() / 2; ++i) 
-        {
-        	currentPositions[i] = (new Position(currentPositions[i].getX() + chromosome.getGene(i * 2).getAllele(), currentPositions[i].getY() + chromosome.getGene((i * 2) + 1).getAllele(), 0));              
-        }
+//        for (int i = 0; i < chromosome.length() / 2; ++i) 
+//        {
+//        	neighborPositions[i] = (new Position(neighborPositions[i].getX() + chromosome.getGene(i * 2).getAllele(), neighborPositions[i].getY() + chromosome.getGene((i * 2) + 1).getAllele(), 0));              
+//        }
+		
+		currentPosition.setX(currentPosition.getX() + chromosome.getGene(0).getAllele());
+		currentPosition.setY(currentPosition.getY() + chromosome.getGene(1).getAllele());
         
     }
     
-    public static void calculateNextPosition(RobotKnowledgeBase rkb)
+    public void calculateNextPosition(RobotKnowledgeBase rkb)
     {
+    	
+    	calculateFuturePositions(rkb.getCurrentPosition(), rkb.getVisibleNeighbors().toArray(new Position[rkb.getVisibleNeighbors().size()]),rkb.getInitialPosition(), rkb.getTargetPosition());
     	System.out.println("PathPlanner -> inside of calculateNextPosition");
-    	rkb.getCurrentPosition().setY(rkb.getCurrentPosition().getY() + 1);
+    	//rkb.getCurrentPosition().setY(rkb.getCurrentPosition().getY() + 1);
     	//update current position
     }
 }

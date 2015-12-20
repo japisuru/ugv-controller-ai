@@ -30,6 +30,6 @@ public class Line {
 	
 	public String toString() 
 	{ 
-        return "Start: " + start.getX() + "," + start.getY() + "," + start.getZ() + "\nl" + "End: " + end.getX() + "," + end.getY() + "," + end.getZ() + "\nl" + "Slope: " + slope;
+        return "Start: " + start.getX() + "," + start.getY() + "," + start.getZ() + " --- " + "End: " + end.getX() + "," + end.getY() + "," + end.getZ() + " --- " + "Slope: " + slope;
     }
 }

@@ -11,7 +11,7 @@ public class AgentUpdate {
 	
 	public AgentUpdate(String msg)
 	{
-		String [] spt1 = msg.split("-");
+		String [] spt1 = msg.split("_");
 		agentId = Integer.parseInt(spt1[1]);
 		String [] spt2 = spt1[2].split(",");
 		x = Double.parseDouble(spt2[0]);

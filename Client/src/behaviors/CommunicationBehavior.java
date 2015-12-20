@@ -1,8 +1,10 @@
 package behaviors;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -24,10 +26,12 @@ public class CommunicationBehavior extends SimpleBehaviour {
 	private static final MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 	RobotAgent agent;
 	RobotKnowledgeBase rkb;
-	PrintWriter out;
+	//PrintWriter out;
 	MyLog mylog;
 	PathPlanner pathPlanner;
 	int collectedCount;
+	BufferedReader in = null;
+	BufferedWriter brout = null;
 
 	public CommunicationBehavior(MyLog myLog, RobotAgent agent, int agentId, RobotKnowledgeBase rkb)
 			throws UnknownHostException, IOException {
@@ -50,8 +54,9 @@ public class CommunicationBehavior extends SimpleBehaviour {
 				Socket socket;
 				try {
 					socket = new Socket(Info.serverHost, Info.serverPort);
-					BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					out = new PrintWriter(socket.getOutputStream(), true);
+					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					//out = new PrintWriter(socket.getOutputStream(), true);
+					brout = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 					mylog.log("Before seperate thread");
 					mylog.log("Inside seperate thread");
 					String line;
@@ -60,22 +65,30 @@ public class CommunicationBehavior extends SimpleBehaviour {
 							line = in.readLine();
 
 							if (line != null) {
-								String[] spt1 = line.split("-");
-
+								String[] spt1 = line.split("_");
+								sleep(1000);
 								System.out.println(
 										agentId + " --> " + "CommunicationBehavior --> " + spt1[0] + " received");
 
 								if (spt1[0] == "Obstacle") {
 									mylog.log("Received Obstacle from sever");
+									mylog.testLog("Received Obstacle from sever");
 									updateObstacles(spt1[1]);
-									calculateNextPosition();
+									//calculateNextPosition();
 								}
 								if (spt1[0] == "Completed")
+								{
 									mylog.log("Received Completed from server");
+									mylog.testLog("Received Completed from server");
+								}
+								
 								calculateNextPosition();
 							}
 
 						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -105,7 +118,7 @@ public class CommunicationBehavior extends SimpleBehaviour {
 		// mylog.log("CommunicationBehavior -> Sent Collect to " + agentId);
 
 		ACLMessage reqMessage = new ACLMessage(ACLMessage.INFORM);
-		reqMessage.setContent("PositionRequest-" + agentId + "-Empty");
+		reqMessage.setContent("PositionRequest_" + agentId + "_Empty");
 		for (int i = 0; i < Info.numOfRobotAgents; i++) {
 			if (i != agentId) {
 				AID driver = new AID("agent" + i + "@" + myAgent.getHap(), AID.ISGUID);
@@ -119,15 +132,25 @@ public class CommunicationBehavior extends SimpleBehaviour {
 	}
 
 	public void sendPositionToSimulator(Position position) {
-		out.println("SimulateAgent" + "-" + agentId + "-" + position.getX() + "," + position.getY() + ","
-				+ position.getZ());
-		mylog.log("Sent new position to simulator");
+		try {
+			brout.write("SimulateAgent" + "_" + agentId + "_" + position.getX() + "," + position.getY() + ","
+					+ position.getZ());
+			brout.newLine();
+	        brout.flush();
+	        mylog.log("Sent new position to simulator: " + position.toString());
+			mylog.testLog("Sent new position to simulator: " + position.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	public void sendPositionToOthers(Position position) {
 
 		ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
-		aclMessage.setContent("PositionUpdate" + "-" + agentId + "-" + position.getX() + "," + position.getY() + ","
+		aclMessage.setContent("PositionUpdate" + "_" + agentId + "_" + position.getX() + "," + position.getY() + ","
 				+ position.getZ());
 
 		for (int i = 0; i < Info.numOfRobotAgents; i++)
@@ -143,12 +166,12 @@ public class CommunicationBehavior extends SimpleBehaviour {
 		ACLMessage aclMessage = myAgent.receive(mt);
 
 		if (aclMessage != null) {
-			String data[] = aclMessage.getContent().split("-");
+			String data[] = aclMessage.getContent().split("_");
 			String event = data[0];
 			int sender = Integer.parseInt(data[1]);
 			String content = data[2];
 
-			mylog.log("ACTION" + " --> " + event + " - " + sender  + " - " + content);
+			mylog.log("ACTION" + " --> " + event + " _ " + sender  + " _ " + content);
 
 			if (event.compareTo("PositionResponse") == 0) 
 			{
@@ -159,6 +182,7 @@ public class CommunicationBehavior extends SimpleBehaviour {
 				if (collectedCount % (Info.numOfRobotAgents - 1) == 0) 
 				{
 					pathPlanner.calculateNextPosition(rkb);
+					mylog.testLog("Calculated next position");
 					sendPositionToSimulator(rkb.getCurrentPosition());
 					
 					mylog.log("Calculated next position");
@@ -168,7 +192,7 @@ public class CommunicationBehavior extends SimpleBehaviour {
 			{
 				mylog.log("Recieved PositionRequest from " + sender);
 				ACLMessage reply = new ACLMessage(ACLMessage.INFORM);
-				reply.setContent("PositionResponse-" + agentId + "-" + rkb.getCurrentPosition().toString());
+				reply.setContent("PositionResponse_" + agentId + "_" + rkb.getCurrentPosition().toString());
 				reply.addReceiver(new AID("agent" + sender + "@" + myAgent.getHap(), AID.ISGUID));
 				myAgent.send(reply);
 				mylog.log("Sent Position response to " + sender);

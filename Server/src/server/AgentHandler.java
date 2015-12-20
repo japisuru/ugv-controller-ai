@@ -37,34 +37,36 @@ public class AgentHandler extends Thread {
     private void update(int agentId, Position position) throws InterruptedException
     {
     	Position currentPosition = (Position) CurrentPositions.concurrentMap.get(agentId);
-    	Line line = new Line(currentPosition,position);
-    	
-    	if(myLog == null)
-    	{
-    		myLog = new MyLog("Server/" + agentId + "_agent_Server", "");
-    	}	
+    	Line line = new Line(currentPosition,position);	
     	
     	myLog.log("Line --> " + line.toString());
     	
-    	while(true)
-    	{
-    		currentPosition = (Position) CurrentPositions.concurrentMap.get(agentId);
-    		
-    		if(currentPosition.getDistance(position) < 1.0)
-    		{
-    			CurrentPositions.concurrentMap.put(agentId, position );
-    			return;
-    		}
-    		else
-    		{
-    			CurrentPositions.concurrentMap.put(agentId,line.calculatePointOnLine(1.0));
-    		}
-    		
-    		myLog.log("Intermediate future Position: " + ((Position) CurrentPositions.concurrentMap.get(agentId)).toString());
-    		
-    		System.out.println("AgentHandler -> Position updated");
-    		sleep(1000);
-    	}
+    	myLog.testLog("New line: " + line.toString());
+    	
+//    	double dist = 1.0;
+//    	
+//    	while(true)
+//    	{
+//    		currentPosition = (Position) CurrentPositions.concurrentMap.get(agentId);
+//    		
+//    		if(currentPosition.getDistance(position) < dist)
+//    		{
+//    			CurrentPositions.concurrentMap.put(agentId, position );
+//    			return;
+//    		}
+//    		else
+//    		{
+//    			CurrentPositions.concurrentMap.put(agentId,line.calculatePointOnLine(dist));
+//    		}
+//    		
+//    		myLog.log("Intermediate future Position: " + ((Position) CurrentPositions.concurrentMap.get(agentId)).toString());
+//    		
+//    		System.out.println("AgentHandler -> Position updated");
+//    		sleep(1000);
+//    		dist++;
+//    	}
+    	sleep(1000);
+    	CurrentPositions.concurrentMap.put(agentId, position );
     }
     
     public void run() {
@@ -78,7 +80,7 @@ public class AgentHandler extends Thread {
             brinp = new BufferedReader(new InputStreamReader(inp));
             brout = new BufferedWriter(new OutputStreamWriter(out));
             sleep(2000);
-            brout.write("Completed--");     	
+            brout.write("Completed__");     	
             brout.newLine();
             brout.flush();
         	System.out.println("AgentHandler -> Sent initial Completed to agents");
@@ -90,21 +92,37 @@ public class AgentHandler extends Thread {
         while (true) {
             try {
                 line = brinp.readLine();
+                
+                if(myLog != null)
+            	{
+                	myLog.testLog("Rec_ " + line);
+            	}
+                
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                     socket.close();
+                    myLog.testLog("Socket closed");
                     return;
                 } else {
 //                    out.writeBytes(line + "\n\r");
 //                    out.flush();
                 	System.out.println("AgentHandler -> Received updated position from a agent");
                 	AgentUpdate agentUpdate = new AgentUpdate(line);
+                	Position resPos = new Position(agentUpdate.getX(), agentUpdate.getY(), agentUpdate.getZ());
                 	
-                	update(agentUpdate.getAgentId(), new Position(agentUpdate.getX(), agentUpdate.getY(), agentUpdate.getZ()));  
+                	if(myLog == null)
+                	{
+                		myLog = new MyLog("Server/" + agentUpdate.getAgentId() + "_agent_Server", "");
+                	}
+                	
+                	myLog.testLog("Received Position: " + resPos.toString());
+                	
+                	update(agentUpdate.getAgentId(), resPos);  
                 	
                 	System.out.println("AgentHandler -> Updated new position in shared position Map");
-                	brout.write("Completed--");
+                	brout.write("Completed__");
                 	brout.newLine();               	
                 	brout.flush();
+                	myLog.testLog("Sent Completed");
                 	System.out.println("AgentHandler -> Sent Completed to agent");
                 }
             } catch (IOException e) {

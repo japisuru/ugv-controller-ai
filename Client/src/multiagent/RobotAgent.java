@@ -36,7 +36,7 @@ public class RobotAgent extends Agent {
 			
 		//addBehaviour(new RobotWalkingBehavior(mylog, this, agentId, rkb));
 		try {
-			addBehaviour(new CommunicationBehavior(new MyLog(agentId + "_agent_CommunicationBehavior", ""), this, agentId, rkb));
+			addBehaviour(new CommunicationBehavior(new MyLog("Client/" + agentId + "_agent_CommunicationBehavior", ""), this, agentId, rkb));
 			//addBehaviour(new NeigborhoodInfoGatheringBehavior(new MyLog(agentId + "_agent_NeigborhoodInfoGatheringBehavior", ""), this, agentId, rkb));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -23,7 +23,7 @@ import terrain.PositionUtil;
 
 final class MyFitnessFunction implements Function<Genotype<DoubleGene>, Double>, Serializable {
 	private static final long serialVersionUID = 1L;
-	private Position[] currentPositions;
+	private Position[] neighborPositions;
 	Position initialPosition;
 	Position targetPosition;
 	double vehicleRadius = 10.0;
@@ -31,76 +31,42 @@ final class MyFitnessFunction implements Function<Genotype<DoubleGene>, Double>,
 	int dimensions = 2;
 	int numOfConstrains = 3;
 
-	public MyFitnessFunction(Position[] currentPositions, Position initialPosition, Position targetPosition) {
-		this.currentPositions = currentPositions;
+	Position currentPosition;
+
+	public MyFitnessFunction(Position currentPosition, Position[] neighborPositions, Position initialPosition,
+			Position targetPosition) {
+		this.neighborPositions = neighborPositions;
 		this.initialPosition = initialPosition;
 		this.targetPosition = targetPosition;
+		this.currentPosition = currentPosition;
 	}
 
 	@Override
 	public Double apply(final Genotype<DoubleGene> genotype) {
-		Double retVal = 1000.0;
+		Double retVal = 10.0;
 
 		final Chromosome<DoubleGene> chromosome = genotype.getChromosome();
 		int length = chromosome.length();
-		Position positions[] = new Position[length / dimensions];
-
-		for (int i = 0; i < length / dimensions; ++i) {
-			positions[i] = new Position(currentPositions[i].getX() + chromosome.getGene(i * dimensions).getAllele(),
-					currentPositions[i].getY() + chromosome.getGene((i * dimensions) + 1).getAllele(), 0);
-		}
+		Position position = new Position(currentPosition.getX() + chromosome.getGene(0).getAllele(),
+				currentPosition.getY() + chromosome.getGene(1).getAllele(), 0);
 
 		// check inter agent collision
-		for (int i = 0; i < positions.length; i++) {
-			for (int j = 0; j < positions.length; j++) {
-				if (i != j) {
-					if (positions[i].getDistance(positions[j]) < vehicleRadius * 2.2) {
-//						retVal = retVal - 50 * ((positions[i].getDistance(positions[j]))
-//								/ (numOfConstrains * (positions.length - 1)));
-						return 0.0;
-					} else {
-						retVal = retVal + 1 / (((positions[i].getDistance(positions[j]))
-								/ (numOfConstrains * 10 * (positions.length - 1))));
-					}
-				}
+		for (int i = 0; i < neighborPositions.length; i++) {
+
+			if (neighborPositions[i].getDistance(position) < vehicleRadius * 2.2) {
+				return 0.0;
+			} else {
+				retVal = retVal + 1 / (((neighborPositions[i].getDistance(position))
+						/ (numOfConstrains * 10 * (neighborPositions.length - 1))));
 			}
+
 		}
 
-		double change = 0;
-//		// check smooth navigation by movement of swarm cent
-//		change = PositionUtil.getCenter(positions).getDistance(PositionUtil.getCenter(currentPositions));
-//
-//		if (change > maxNavDisPerStep) {
-//			retVal = retVal + 1 / ((change / (numOfConstrains * 1000)));
-//		} else {
-//			retVal = retVal + (change / (numOfConstrains * 1000));
-//		}
-
 		// check moving out from initial position
-		change = PositionUtil.getCenter(positions).getDistance(initialPosition);
-		retVal = retVal + (change / (numOfConstrains));
+		retVal = retVal + (position.getDistance(initialPosition) / (numOfConstrains));
 
 		// check check moving in to target position
-		change = PositionUtil.getCenter(positions).getDistance(targetPosition);
-		retVal = retVal - (change / (numOfConstrains));
-
-
-//		// check the smooth navigation by movement of single agent wise
-//		for (int i = 0; i < positions.length; i++) {
-//			System.out.println("DDDDDDDDDDDDDDDDDDDDDD  " + currentPositions[i].getDistance(positions[i]));
-//			if (currentPositions[i].getDistance(positions[i]) > maxNavDisPerStep) {
-//				//retVal = retVal + 1 / ((currentPositions[i].getDistance(positions[i]) / (numOfConstrains * positions.length * 800)));
-//				return 0.0;
-//			} else {
-//				retVal = retVal + (currentPositions[i].getDistance(positions[i]) / (numOfConstrains * positions.length * 500));
-//			}
-//
-//		}
-//		
-//		// check the smooth navigation by movement of single agent wise
-//				for (int i = 0; i < positions.length; i++) {
-//					retVal = retVal - (currentPositions[i].getDistance(targetPosition) / (numOfConstrains * 500));
-//				}
+		retVal = retVal - (position.getDistance(targetPosition) / (numOfConstrains));
 
 		return retVal;
 
