@@ -52,7 +52,7 @@ public class AgentHandler extends Thread {
 //    		if(currentPosition.getDistance(position) < dist)
 //    		{
 //    			CurrentPositions.concurrentMap.put(agentId, position );
-//    			return;
+//    			break;
 //    		}
 //    		else
 //    		{
@@ -79,7 +79,7 @@ public class AgentHandler extends Thread {
             out = socket.getOutputStream();
             brinp = new BufferedReader(new InputStreamReader(inp));
             brout = new BufferedWriter(new OutputStreamWriter(out));
-            sleep(2000);
+            sleep(1000);
             brout.write("Completed__");     	
             brout.newLine();
             brout.flush();

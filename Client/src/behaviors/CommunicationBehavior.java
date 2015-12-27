@@ -116,14 +116,17 @@ public class CommunicationBehavior extends SimpleBehaviour {
 		// aclMessage.addReceiver(new AID("agent" + agentId, AID.ISLOCALNAME));
 		// myAgent.send(aclMessage);
 		// mylog.log("CommunicationBehavior -> Sent Collect to " + agentId);
-
+		rkb.setTargetPosition(rkb.getTargetPositions().get(agentId % 2));
 		ACLMessage reqMessage = new ACLMessage(ACLMessage.INFORM);
 		reqMessage.setContent("PositionRequest_" + agentId + "_Empty");
 		for (int i = 0; i < Info.numOfRobotAgents; i++) {
 			if (i != agentId) {
-				AID driver = new AID("agent" + i + "@" + myAgent.getHap(), AID.ISGUID);
-				reqMessage.addReceiver(driver);
-				mylog.log("Sent position request to " + i);
+//				if((agentId % 2 == 0 && i % 2 == 0) || (agentId % 2 == 1 && i % 2 == 1))
+//				{
+					AID driver = new AID("agent" + i + "@" + myAgent.getHap(), AID.ISGUID);
+					reqMessage.addReceiver(driver);
+					mylog.log("Sent position request to " + i);
+//				}
 			}
 		}
 		mylog.log("Sent position request to all others");

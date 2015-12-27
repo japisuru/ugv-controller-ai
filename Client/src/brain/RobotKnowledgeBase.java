@@ -18,14 +18,16 @@ public class RobotKnowledgeBase
 	private Position initialPosition;
 	private Position targetPosition;
 	
-	public RobotKnowledgeBase(int agentId, double visibilityDistance, double visibilityAngle, Position initialPosition, Position targetPosition)
+	private ArrayList<Position> targetPositions = new ArrayList<Position>();
+	
+	public RobotKnowledgeBase(int agentId, double visibilityDistance, double visibilityAngle, Position initialPosition, ArrayList<Position> targetPositions)
 	{
 		this.agentId = agentId;
 		this.visibilityDistance = visibilityDistance;
 		this.visibilityAngle = visibilityAngle;
 		this.initialPosition = initialPosition;
 		this.currentPosition = initialPosition;
-		this.targetPosition = targetPosition;
+		this.setTargetPositions(targetPositions);
 		System.out.println(agentId + " --> " + "RobotKnowledgeBase" + " --> " + "Created knowledge base");
 	}
 	
@@ -74,7 +76,15 @@ public class RobotKnowledgeBase
 	public ArrayList<Position> getVisibleNeighbors()
 	{
 		//have to write a algorithm to get only visible neighbors. Upto now it's returning all obstacles.
-		return neighbors;
+		ArrayList<Position> newNeighors = new ArrayList<Position>();
+		for(Position pos : neighbors)
+		{
+			if(pos.getDistance(currentPosition) < 50)
+			{
+				newNeighors.add(pos);
+			}
+		}
+		return newNeighors;
 	}
 
 	public Position getCurrentPosition() {
@@ -95,6 +105,14 @@ public class RobotKnowledgeBase
 	public void setInitialPosition(Position initialPosition) {
 		this.initialPosition = initialPosition;
 		System.out.println(agentId + " --> " + "RobotKnowledgeBase" + " --> " + "Setted initial positon");
+	}
+
+	public ArrayList<Position> getTargetPositions() {
+		return targetPositions;
+	}
+
+	public void setTargetPositions(ArrayList<Position> targetPositions) {
+		this.targetPositions = targetPositions;
 	}
 
 	public Position getTargetPosition() {

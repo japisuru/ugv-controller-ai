@@ -1,5 +1,7 @@
 package util;
 
+import java.util.ArrayList;
+
 import terrain.Position;
 
 public class Info {
@@ -8,7 +10,8 @@ public class Info {
 			new Position(170.0, 2.0, 0.0), new Position(250.0, 2.0, 0.0), new Position(280.0, 2.0, 0.0),
 			new Position(300.0, 2.0, 0.0) };
 	
-	public static Position targetPosition = new Position(500.0, 780, 0.0);
+	//public static Position targetPosition = new Position(500.0, 780, 0.0);
+	public static Position[] targetPositions = {new Position(500.0, 780, 0.0), new Position(700.0, 780, 0.0) };
 	
 	public static int numOfRobotAgents = currentPositions.length;
 	

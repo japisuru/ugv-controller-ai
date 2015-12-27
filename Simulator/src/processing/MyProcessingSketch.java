@@ -42,7 +42,10 @@ public class MyProcessingSketch extends PApplet {
 
 				// color c = color(255, 0, 0);
 				fill(random(255));
-				ellipse((float) Info.targetPosition.getX(), (float) Info.targetPosition.getY(), 2, 2);
+				for(Position pos : Info.targetPositions)
+				{
+					ellipse((float) pos.getX(), (float) pos.getY(), 2, 2);
+				}
 			}
 			System.out.println();
 			System.out.println("*******************************************************************");

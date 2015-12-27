@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import behaviors.CommunicationBehavior;
 import behaviors.NeigborhoodInfoGatheringBehavior;
@@ -32,7 +33,7 @@ public class RobotAgent extends Agent {
 
 		//MyLog mylog = new MyLog(agentId + "_agent", "");
 		
-		rkb = new RobotKnowledgeBase(agentId, 1, 0.5, Info.currentPositions[agentId], Info.targetPosition);
+		rkb = new RobotKnowledgeBase(agentId, 1, 0.5, Info.currentPositions[agentId], new ArrayList<Position>(Arrays.asList(Info.targetPositions)));
 			
 		//addBehaviour(new RobotWalkingBehavior(mylog, this, agentId, rkb));
 		try {

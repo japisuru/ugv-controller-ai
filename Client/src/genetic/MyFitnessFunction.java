@@ -43,7 +43,7 @@ final class MyFitnessFunction implements Function<Genotype<DoubleGene>, Double>,
 
 	@Override
 	public Double apply(final Genotype<DoubleGene> genotype) {
-		Double retVal = 10.0;
+		Double retVal = 1000.0;
 
 		final Chromosome<DoubleGene> chromosome = genotype.getChromosome();
 		int length = chromosome.length();
