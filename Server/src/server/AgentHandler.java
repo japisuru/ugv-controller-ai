@@ -65,7 +65,7 @@ public class AgentHandler extends Thread {
 //    		sleep(1000);
 //    		dist++;
 //    	}
-    	sleep(1000);
+    	//sleep(1000);
     	CurrentPositions.concurrentMap.put(agentId, position );
     }
     
@@ -79,12 +79,12 @@ public class AgentHandler extends Thread {
             out = socket.getOutputStream();
             brinp = new BufferedReader(new InputStreamReader(inp));
             brout = new BufferedWriter(new OutputStreamWriter(out));
-            sleep(1000);
+            //sleep(100);
             brout.write("Completed__");     	
             brout.newLine();
             brout.flush();
         	System.out.println("AgentHandler -> Sent initial Completed to agents");
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
         	System.out.println("AgentHandler -> Initial sent failure");
             return;
         }

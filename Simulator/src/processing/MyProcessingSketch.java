@@ -20,7 +20,7 @@ public class MyProcessingSketch extends PApplet {
 
 	public void setup() {
 		// frameRate(1);
-		strokeWeight((float) 20.0);
+		strokeWeight((float) 1.0);
 		stroke(255, 100);
 		CurrentPositions.init();
 	}
@@ -38,13 +38,24 @@ public class MyProcessingSketch extends PApplet {
 
 				System.out.print(x + "," + y + "  <-->  ");
 				// segment(x, y, angle1);
-				ellipse(x, y, 2, 2);
+				ellipseMode(CENTER);
+				fill(192, 255, 62, 40);
+				ellipse(x, y, 50, 50);			
+				
+				fill(255,255,0);
+				ellipse(x, y, 20, 20);
 
-				// color c = color(255, 0, 0);
-				fill(random(255));
+
+				fill(0,255,0);
 				for(Position pos : Info.targetPositions)
 				{
-					ellipse((float) pos.getX(), (float) pos.getY(), 2, 2);
+					ellipse((float) pos.getX(), (float) pos.getY(), 20, 20);
+				}
+				
+				fill(255,0,0);
+				for(Position pos : Info.obstaclePositions)
+				{
+					ellipse((float) pos.getX(), (float) pos.getY(), 20, 20);
 				}
 			}
 			System.out.println();

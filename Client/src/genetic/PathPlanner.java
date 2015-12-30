@@ -35,9 +35,9 @@ public class PathPlanner {
     static double maximumGeneValue = 10;
     private static final int numOfIterations = 150;
     
-    public void calculateFuturePositions(Position currentPosition, Position [] neighborPositions, Position initialPosition, Position targetPosition)
+    public void calculateFuturePositions(Position currentPosition, Position [] neighborPositions, Position initialPosition, Position targetPosition, Position [] obstaclePositions)
     {
-        MyFitnessFunction ff = new MyFitnessFunction(currentPosition, neighborPositions,  initialPosition, targetPosition);
+        MyFitnessFunction ff = new MyFitnessFunction(currentPosition, neighborPositions,  initialPosition, targetPosition, obstaclePositions);
         final Engine<DoubleGene, Double> engine = Engine
 			.builder(
 				ff,
@@ -86,9 +86,11 @@ public class PathPlanner {
     
     public void calculateNextPosition(RobotKnowledgeBase rkb)
     {
-    	
-    	calculateFuturePositions(rkb.getCurrentPosition(), rkb.getVisibleNeighbors().toArray(new Position[rkb.getVisibleNeighbors().size()]),rkb.getInitialPosition(), rkb.getTargetPosition());
+    	Position currentPosition = rkb.getCurrentPosition();
+    	calculateFuturePositions(rkb.getCurrentPosition(), rkb.getVisibleNeighbors().toArray(new Position[rkb.getVisibleNeighbors().size()]),rkb.getInitialPosition(), rkb.getTargetPosition(), rkb.getVisibleObstacles().toArray(new Position[rkb.getVisibleObstacles().size()]));
     	System.out.println("PathPlanner -> inside of calculateNextPosition");
+    	
+    	rkb.getThinkingMemory().memorize(currentPosition, rkb.getCurrentPosition(), rkb.getInitialPosition(), rkb.getTargetPosition(), rkb.getVisibleNeighbors(), rkb.getVisibleObstacles());
     	//rkb.getCurrentPosition().setY(rkb.getCurrentPosition().getY() + 1);
     	//update current position
     }

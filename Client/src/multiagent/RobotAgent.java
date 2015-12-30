@@ -13,6 +13,7 @@ import behaviors.CommunicationBehavior;
 import behaviors.NeigborhoodInfoGatheringBehavior;
 import behaviors.RobotWalkingBehavior;
 import brain.RobotKnowledgeBase;
+import brain.ThinkingMemory;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -33,7 +34,7 @@ public class RobotAgent extends Agent {
 
 		//MyLog mylog = new MyLog(agentId + "_agent", "");
 		
-		rkb = new RobotKnowledgeBase(agentId, 1, 0.5, Info.currentPositions[agentId], new ArrayList<Position>(Arrays.asList(Info.targetPositions)));
+		rkb = new RobotKnowledgeBase(agentId, 1, 0.5, Info.currentPositions[agentId], new ArrayList<Position>(Arrays.asList(Info.targetPositions)),new ArrayList<Position>(Arrays.asList(Info.obstaclePositions)), new ThinkingMemory(agentId + ""));
 			
 		//addBehaviour(new RobotWalkingBehavior(mylog, this, agentId, rkb));
 		try {

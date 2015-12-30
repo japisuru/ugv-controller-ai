@@ -30,15 +30,17 @@ final class MyFitnessFunction implements Function<Genotype<DoubleGene>, Double>,
 	double maxNavDisPerStep = 10.0;
 	int dimensions = 2;
 	int numOfConstrains = 3;
+	Position[] obstaclePositions;
 
 	Position currentPosition;
 
 	public MyFitnessFunction(Position currentPosition, Position[] neighborPositions, Position initialPosition,
-			Position targetPosition) {
+			Position targetPosition, Position[] obstaclePositions) {
 		this.neighborPositions = neighborPositions;
 		this.initialPosition = initialPosition;
 		this.targetPosition = targetPosition;
 		this.currentPosition = currentPosition;
+		this.obstaclePositions = obstaclePositions;
 	}
 
 	@Override
@@ -60,6 +62,14 @@ final class MyFitnessFunction implements Function<Genotype<DoubleGene>, Double>,
 						/ (numOfConstrains * 10 * (neighborPositions.length - 1))));
 			}
 
+		}
+
+		// check obstacle collision
+		for (int i = 0; i < obstaclePositions.length; i++) {
+
+			if (obstaclePositions[i].getDistance(position) < vehicleRadius * 2.2) {
+				return 0.0;
+			} 
 		}
 
 		// check moving out from initial position

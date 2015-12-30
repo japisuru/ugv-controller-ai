@@ -18,5 +18,7 @@ public class Info {
 	public static String serverHost = "localhost";
 	
 	public static int serverPort = 1978;
+	
+	public static Position[] obstaclePositions = {new Position(500.0, 200, 0.0), new Position(600.0, 600, 0.0) };
 
 }
