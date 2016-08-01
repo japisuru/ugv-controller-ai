@@ -15,6 +15,7 @@ public class Simulator {
 	public static void start()
 	{
 		PApplet.main(new String[] { "--present", "processing.MyProcessingSketch" });
+		//PApplet.main(new String[] { "--present", "processing.KnowledgeBaseSketch" });
 	}
 
 }
