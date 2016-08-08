@@ -1,6 +1,7 @@
 package indoorPositioning;
 
 import java.awt.Component;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,6 +30,8 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
+import navigation.RobotNavigator;
+
 public class MainIndoorPositioning {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -45,14 +48,16 @@ public class MainIndoorPositioning {
 		jframe.setSize(640, 480);
 		jframe.setVisible(true);
 
-		JFrame jframe2 = new JFrame("DETECTED BLOB");
-		jframe2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JLabel vidpanel2 = new JLabel();
-		jframe2.setContentPane(vidpanel2);
-		jframe2.setSize(640, 480);
-		jframe2.setVisible(true);
+//		JFrame jframe2 = new JFrame("DETECTED BLOB");
+//		jframe2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		JLabel vidpanel2 = new JLabel();
+//		jframe2.setContentPane(vidpanel2);
+//		jframe2.setSize(640, 480);
+//		jframe2.setVisible(true);
 
-		VideoCapture capture = new VideoCapture("http://192.168.8.100:8080/video?x.mjpeg");
+		VideoCapture capture = new VideoCapture("http://192.168.8.101:8080/video?x.mjpeg");
+		//VideoCapture capture = new VideoCapture("http://192.168.1.112:8080/video?x.mjpeg");
+		//VideoCapture capture = new VideoCapture("/home/isuru/MSC-AI/Project/ImageProcessing/test_new.mp4");
 
 		Mat frame = new Mat();
 		Mat hsv_image = new Mat();
@@ -72,7 +77,7 @@ public class MainIndoorPositioning {
 		//Scalar g_hsv_min = new Scalar(50, 50, 50, 0);
 		//Scalar g_hsv_max = new Scalar(70, 255, 255, 0);
 		Scalar g_hsv_min = new Scalar(88, 186, 85, 0);
-		Scalar g_hsv_max = new Scalar(99, 255, 129, 0);
+		Scalar g_hsv_max = new Scalar(99, 255, 200, 0);
 
 		// blue
 		Scalar b_hsv_min = new Scalar(110, 53, 176, 0);
@@ -91,7 +96,7 @@ public class MainIndoorPositioning {
 	    Scalar r_hsv_max2 = new Scalar(179, 255, 255, 0);
 
 		// pink
-		Scalar p_hsv_min = new Scalar(144, 22, 186, 0);
+		Scalar p_hsv_min = new Scalar(144, 22, 177, 0);
 		Scalar p_hsv_max = new Scalar(173, 42, 255, 0);
 		
 		// yellow
@@ -125,6 +130,8 @@ public class MainIndoorPositioning {
 		Size sz = new Size(640, 480);
 
 		Boolean isVideoEnable = true;
+		int frameNum = 0;
+		RobotNavigator rn = new RobotNavigator();
 
 		if (isVideoEnable) {
 			capture.read(frame);
@@ -134,7 +141,7 @@ public class MainIndoorPositioning {
 					if (!frame.empty()) {
 
 						Imgproc.resize(frame, frame, sz);
-
+						//Highgui.imwrite("/home/isuru/MSC-AI/Project/ImageProcessing/test/original.jpg", frame);
 						Imgproc.cvtColor(frame, hsv_image, Imgproc.COLOR_BGR2HSV);
 
 						Core.inRange(hsv_image, b_hsv_min, b_hsv_max, thresholded);
@@ -142,15 +149,17 @@ public class MainIndoorPositioning {
 						draw(rectArr, frame);
 
 						Core.inRange(hsv_image, g_hsv_min, g_hsv_max, thresholded);
-						rectArr = detectVehicles(thresholded);
-						draw(rectArr, frame);
+						Rect[] rectArrGreen = detectVehicles(thresholded);
+						draw(rectArrGreen, frame);
 						
-						Core.inRange(hsv_image, p_hsv_min, p_hsv_max, thresholded);					
-						List<Rect> lst = detectObstacles(thresholded);
-						draw(lst,frame);
+						Core.inRange(hsv_image, p_hsv_min, p_hsv_max, thresholded);	
+						//Highgui.imwrite("/home/isuru/MSC-AI/Project/ImageProcessing/test/thresh.jpg", thresholded);
+						List<Rect> lstPink = detectObstacles(thresholded);
+						draw(lstPink,frame);
+						//Highgui.imwrite("/home/isuru/MSC-AI/Project/ImageProcessing/test/final.jpg", frame);
 						
 						Core.inRange(hsv_image, y_hsv_min, y_hsv_max, thresholded);					
-						lst = detectObstacles(thresholded);
+						List<Rect> lst = detectObstacles(thresholded);
 						draw(lst,frame);
 
 						Core.inRange(hsv_image, r_hsv_min, r_hsv_max, thresholded);
@@ -192,14 +201,23 @@ public class MainIndoorPositioning {
 						 * 
 						 */
 
-						 ImageIcon image2 = new
-						 ImageIcon(Mat2bufferedImage(thresholded));
-						 vidpanel2.setIcon(image2);
-						 vidpanel2.repaint();
+						 //ImageIcon image2 = new
+						 //ImageIcon(Mat2bufferedImage(thresholded));
+						 //vidpanel2.setIcon(image2);
+						 //vidpanel2.repaint();
 
 						ImageIcon image = new ImageIcon(Mat2bufferedImage(frame));
 						vidpanel.setIcon(image);
 						vidpanel.repaint();
+						
+						if(frameNum % 20 == 0 && rectArrGreen.length == 2 && lstPink.size() == 1 && lstPink.get(0) != null && rectArrGreen[0] != null && rectArrGreen[1] != null)
+						{
+							rn.navigate(2,rectArrGreen[1].x,rectArrGreen[1].y,rectArrGreen[0].x,rectArrGreen[0].y,lstPink.get(0).x,lstPink.get(0).y);	
+						}
+							
+						lstPink.clear();
+						frameNum++;
+						
 
 					}
 				}
