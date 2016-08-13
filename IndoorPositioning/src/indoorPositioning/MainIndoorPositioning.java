@@ -30,7 +30,9 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
+import aimodule.RobotVehicle;
 import navigation.RobotNavigator;
+import terrain.Position;
 
 public class MainIndoorPositioning {
 	static {
@@ -132,6 +134,12 @@ public class MainIndoorPositioning {
 		Boolean isVideoEnable = true;
 		int frameNum = 0;
 		RobotNavigator rn = new RobotNavigator();
+		RobotVehicle robot_1 = new RobotVehicle(1);
+		RobotVehicle robot_2 = new RobotVehicle(2);
+		RobotVehicle robot_3 = new RobotVehicle(3);
+		Position vehicle_1;
+		Position vehicle_2;
+		Position vehicle_3;
 
 		if (isVideoEnable) {
 			capture.read(frame);
@@ -145,8 +153,8 @@ public class MainIndoorPositioning {
 						Imgproc.cvtColor(frame, hsv_image, Imgproc.COLOR_BGR2HSV);
 
 						Core.inRange(hsv_image, b_hsv_min, b_hsv_max, thresholded);
-						Rect[] rectArr = detectVehicles(thresholded);
-						draw(rectArr, frame);
+						Rect[] rectArrBlue = detectVehicles(thresholded);
+						draw(rectArrBlue, frame);
 
 						Core.inRange(hsv_image, g_hsv_min, g_hsv_max, thresholded);
 						Rect[] rectArrGreen = detectVehicles(thresholded);
@@ -159,8 +167,8 @@ public class MainIndoorPositioning {
 						//Highgui.imwrite("/home/isuru/MSC-AI/Project/ImageProcessing/test/final.jpg", frame);
 						
 						Core.inRange(hsv_image, y_hsv_min, y_hsv_max, thresholded);					
-						List<Rect> lst = detectObstacles(thresholded);
-						draw(lst,frame);
+						List<Rect> obstacleLst = detectObstacles(thresholded);
+						draw(obstacleLst,frame);
 
 						Core.inRange(hsv_image, r_hsv_min, r_hsv_max, thresholded);
 //						Core.inRange(hsv_image, r_hsv_min2, r_hsv_max2, thresholded2);
@@ -186,8 +194,8 @@ public class MainIndoorPositioning {
 //						Core.bitwise_and(thresholded, thresholded2,
 //						thresholded);
 						
-						rectArr = detectVehicles(thresholded);
-						draw(rectArr, frame);
+						Rect[] rectArrRed = detectVehicles(thresholded);
+						draw(rectArrBlue, frame);
 						
 						
 
@@ -210,9 +218,48 @@ public class MainIndoorPositioning {
 						vidpanel.setIcon(image);
 						vidpanel.repaint();
 						
+//						if(frameNum % 20 == 0 && rectArrGreen.length == 2 && lstPink.size() == 1 && lstPink.get(0) != null && rectArrGreen[0] != null && rectArrGreen[1] != null)
+//						{
+//							rn.navigate(2,rectArrGreen[1].x,rectArrGreen[1].y,rectArrGreen[0].x,rectArrGreen[0].y,lstPink.get(0).x,lstPink.get(0).y);	
+//						}
+						
+						
+						
+						if((frameNum == 10 || frameNum % 90 == 0) && rectArrGreen.length == 2 && lstPink.size() == 1 && lstPink.get(0) != null && rectArrGreen[0] != null && rectArrGreen[1] != null)
+						{
+							ArrayList<Position> obstaclePositions = new ArrayList<>();
+							ArrayList<Position> otherVehicles = new ArrayList<>();
+												
+							vehicle_1 = new Position((rectArrRed[1].x + rectArrRed[0].x) / 2,(rectArrRed[1].y + rectArrRed[0].y) / 2,0.0);
+							vehicle_2 = new Position((rectArrGreen[1].x + rectArrGreen[0].x) / 2,(rectArrGreen[1].y + rectArrGreen[0].y) / 2,0.0);	
+							vehicle_3 = new Position((rectArrBlue[1].x + rectArrBlue[0].x) / 2,(rectArrBlue[1].y + rectArrBlue[0].y) / 2,0.0);
+							
+							Position targetPosition = new Position(lstPink.get(0).x,lstPink.get(0).y,0.0);
+							for(Rect rect : obstacleLst)
+							{
+								obstaclePositions.add(new Position(0.5 * (rect.tl().x + rect.br().x), 0.5 * (rect.tl().y + rect.br().y),0.0));
+							}
+							
+							otherVehicles.add(vehicle_2);
+							otherVehicles.add(vehicle_3);																				
+							robot_1.think(vehicle_1, targetPosition, obstaclePositions, otherVehicles);
+							
+							otherVehicles.clear();
+							otherVehicles.add(vehicle_1);
+							otherVehicles.add(vehicle_3);
+							robot_2.think(vehicle_2, targetPosition, obstaclePositions, otherVehicles);
+							
+							otherVehicles.clear();
+							otherVehicles.add(vehicle_1);
+							otherVehicles.add(vehicle_2);
+							robot_3.think(vehicle_3, targetPosition, obstaclePositions, otherVehicles);
+						}
+						
 						if(frameNum % 20 == 0 && rectArrGreen.length == 2 && lstPink.size() == 1 && lstPink.get(0) != null && rectArrGreen[0] != null && rectArrGreen[1] != null)
 						{
-							rn.navigate(2,rectArrGreen[1].x,rectArrGreen[1].y,rectArrGreen[0].x,rectArrGreen[0].y,lstPink.get(0).x,lstPink.get(0).y);	
+							robot_1.navigate(rectArrGreen[1].x,rectArrGreen[1].y,rectArrGreen[0].x,rectArrGreen[0].y);
+							robot_2.navigate(rectArrGreen[1].x,rectArrGreen[1].y,rectArrGreen[0].x,rectArrGreen[0].y);	
+							robot_3.navigate(rectArrGreen[1].x,rectArrGreen[1].y,rectArrGreen[0].x,rectArrGreen[0].y);
 						}
 							
 						lstPink.clear();

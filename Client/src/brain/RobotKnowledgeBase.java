@@ -53,6 +53,12 @@ public class RobotKnowledgeBase
 		obstaclePositions.remove(position);
 	}
 	
+	public void removeAllObstacles()
+	{
+		obstaclePositions.clear();
+		System.out.println(agentId + " --> " + "RobotKnowledgeBase" + " --> " + "Removed all obstacles");
+	}
+	
 	public ArrayList<Position> getVisibleObstacles()
 	{
 		ArrayList<Position> newObstacles = new ArrayList<Position>();
